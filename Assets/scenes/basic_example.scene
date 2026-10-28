@@ -1096,7 +1096,7 @@
           "Position": "-1100,0,-4.88281257E-05",
           "Rotation": "0,0,0,1",
           "Scale": "1,1,1",
-          "Tags": "light_spot",
+          "Tags": "light_spot,light",
           "Enabled": true,
           "NetworkMode": 2,
           "NetworkFlags": 0,
@@ -1348,6 +1348,10 @@
           "_CycleSeconds": 338.35367,
           "_DayColor": "0.76744,0.78682,1,1",
           "_ElevationDegrees": 5,
+          "_Moon": {
+            "_type": "gameobject",
+            "go": "ce110111-f4aa-4dc1-9e47-27fe3636e139"
+          },
           "_NightColor": "0.31628,0.00441,0.19153,1",
           "_Skybox": {
             "_type": "component",

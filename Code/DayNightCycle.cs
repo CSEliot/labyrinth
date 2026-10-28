@@ -11,9 +11,9 @@
 // permission from KiteLion Games, LLC.
 // 
 // Description:
-// Drives a looping day/night cycle from a single 0..1 Degree value: blends the
-// SkyBox2D night material parameter, tints the directional light, and yaws the
-// light so the sun/moon disc travels across the sky.
+// Drives a looping day/night cycle from a single 0..1 Degree value: the light follows
+// an arc that peaks at _ElevationDegrees, the moon object orbits opposite the sun, and
+// at night the light takes the moon's angle (hard day/night switch for now).
 // 
 // License:
 // This code is provided "as is," without warranty of any kind, express or
@@ -42,11 +42,18 @@ public sealed class DayNightCycle : Component
     // Degree per frame, so the cycle is real time and independent of frame rate.
     [Property, Range( 10f, 3600f )] private float _CycleSeconds { get; set; } = 180f;
     [Property] private float _SweepDegrees { get; set; } = 360f; // world-space yaw over a full cycle; 360 keeps the wrap seamless
-    [Property, Range( 0f, 90f )] private float _ElevationDegrees { get; set; } = 40f; // pitch of the light above the horizon
+    [Property, Range( 0f, 90f )] private float _ElevationDegrees { get; set; } = 40f; // PEAK altitude of the light arc in degrees (noon/midnight)
     [Property] private SkyBox2D _Skybox { get; set; }
     [Property] private DirectionalLight _Sun { get; set; }
+    // The moon object. It orbits the world origin opposite the sun at the distance it was authored at.
+    [Property] private GameObject _Moon { get; set; }
     [Property] private Color _DayColor { get; set; }
     [Property] private Color _NightColor { get; set; }
+
+    // Moon distance from the world origin, captured from its authored position the first time Apply
+    // runs (OnEnabled runs before OnStart, so capture lazily). 0 = not captured yet; a hotload also
+    // leaves it 0 and the capture then reads the moon's current (already orbiting) distance.
+    private float _moonRadius;
 
     // Private copy of the sky material: Material.Set on the shared loaded .vmat flags the
     // asset as edited (dirty in the editor every tick), so we only ever write to this copy.
@@ -76,6 +83,8 @@ public sealed class DayNightCycle : Component
             }
         }
 
+        // _Moon is optional: without it the cycle still drives the sky and the light, only the
+        // moon object stops orbiting, so it is not part of the missing-reference warning.
         if ( _Skybox is null || _Sun is null || _SkyBoxMaterial is null )
             Log.Warning( $"DayNightCycle on '{GameObject.Name}': missing {MissingReferenceName()} - the day/night cycle will not render." );
 
@@ -95,28 +104,57 @@ public sealed class DayNightCycle : Component
         Apply();
     }
 
-    // Single place that pushes the current Degree to the material, the light rotation and the
-    // light colour, so start/enable/update can never disagree.
+    // Single place that pushes the current Degree to the material, the light rotation, the moon
+    // object and the light colour, so start/enable/update can never disagree.
     private void Apply()
     {
+        // The altitude is a cosine of the phase, so it peaks at Degree 0 (noon), drops through
+        // the horizon at 0.25 (sunset), bottoms out at 0.5 (midnight) and rises again at 0.75.
+        // The light TRAVELS along its Forward (the axis its gizmo arrows are drawn on), so a
+        // positive pitch aims Forward DOWN out of the sky, which is the only valid state for the
+        // light. The sky shader draws the disc at the negation of that travel, i.e. along
+        // Backward, so a light pitched by sunAltitude puts its disc sunAltitude above the horizon.
+        // sunRotation itself goes negative at night; it then only places the moon, never the light.
+        // Yaw is composed on the LEFT, so it is applied in world space on top of the pitch.
+        float phase = Degree * MathF.PI * 2f;                        // 0 = noon
+        float arc = MathF.Cos( phase );                              // 1 noon, 0 at the horizon, -1 midnight
+        float sunAltitude = _ElevationDegrees * arc;                 // degrees above the horizon
+        // Night is tested on the cosine, not the altitude, so a peak of 0 degrees still has nights.
+        bool isNight = arc < 0f;
+        float yaw = _SweepDegrees * Degree;
+        Rotation sunRotation = Rotation.FromYaw( yaw ) * Rotation.From( sunAltitude, 0f, 0f );
+
+        // Below the horizon is night. Hard switch for now (Task 1 turns this into a fade); this
+        // is the ONE place the night test lives.
         if ( _SkyBoxMaterial is not null )
-            _SkyBoxMaterial.Set( "g_flNightBlend", Degree );
+            _SkyBoxMaterial.Set( "g_flNightBlend", isNight ? 1f : 0f );
+
+        ApplyMoon( sunRotation );
 
         if ( _Sun is null )
             return;
 
-        // This component owns the light's rotation: the authored pitch in the scene is replaced
-        // by _ElevationDegrees, so the disc is always above the horizon.
-        // The light TRAVELS along its Forward (the axis its gizmo arrows are drawn on), so a
-        // positive pitch aims Forward DOWN out of the sky, which is the only valid state for a
-        // sun or moon. The sky shader draws the disc at the negation of that travel, i.e. along
-        // Backward, so the disc ends up _ElevationDegrees above the horizon.
-        // Yaw is composed on the LEFT, so it is applied in world space on top of the pitch.
-        _Sun.WorldRotation = Rotation.FromYaw( _SweepDegrees * Degree ) * Rotation.From( _ElevationDegrees, 0f, 0f );
+        // This component owns the light's rotation. At night the one light takes the moon's
+        // angle: the moon sits opposite the sun, so its disc (the light's Backward) is drawn on
+        // the moon object instead of on the sun, which is below the horizon now.
+        _Sun.WorldRotation = isNight
+            ? Rotation.FromYaw( yaw + 180f ) * Rotation.From( -sunAltitude, 0f, 0f )   // disc on the moon
+            : sunRotation;
 
         // Never pure black: a black directional light means "sun off" and the sky shader
-        // stops drawing the sun/moon disc. Lerping between two lit colours stays non-black.
-        _Sun.LightColor = Color.Lerp(_DayColor, _NightColor, Degree);
+        // stops drawing the sun/moon disc. Day and night are two lit tints, swapped whole.
+        _Sun.LightColor = isNight ? _NightColor : _DayColor;
+    }
+
+    // Keeps the moon object opposite the sun at its authored distance, turning with the orbit so
+    // its local +X still faces the world origin (its child light keeps the far-side offset).
+    private void ApplyMoon( Rotation sunRotation )
+    {
+        if ( !_Moon.IsValid() ) return;                // unset or destroyed
+        if ( _moonRadius <= 0f ) _moonRadius = _Moon.WorldPosition.Length;
+        if ( _moonRadius <= 0f ) return;              // authored at the origin: nothing to orbit
+        _Moon.WorldPosition = sunRotation.Forward * _moonRadius;   // opposite the sun
+        _Moon.WorldRotation = sunRotation * Rotation.FromYaw( 180f ); // local +X faces the origin
     }
 
     private string MissingReferenceName()
