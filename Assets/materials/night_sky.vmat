@@ -1,0 +1,27 @@
+// Night sky: procedural stars + moon disc, dimmed atmosphere.
+// Points at the compiled shader; the path must contain "sky" or SkyBox2D refuses it.
+Layer0
+{
+	shader "shaders/night_sky.shader_c"
+
+	// --- Night base -------------------------------------------------------
+	g_flNightAtmosphere		"0.030"
+	g_vNightZenith			"[0.010000 0.014000 0.035000]"
+	g_vNightHorizon			"[0.045000 0.055000 0.090000]"
+
+	// --- Stars ------------------------------------------------------------
+	g_flStarDensity			"220.000"
+	g_flStarBrightness		"1.350"
+	g_flStarThreshold		"0.820"
+	g_flStarSize			"0.300"
+	g_flStarHorizonFade		"4.000"
+	g_flStarTwinkle			"0.000"
+
+	// --- Moon -------------------------------------------------------------
+	g_flMoonSizeDeg			"2.200"
+	g_flMoonBrightness		"3.000"
+	g_flMoonHaloStrength	"0.350"
+	g_flMoonHaloFalloff		"12.000"
+	g_flMoonMottle			"0.250"
+	g_flMoonEdgeSoftness	"0.080"
+}

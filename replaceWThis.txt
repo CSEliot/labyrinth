@@ -1,0 +1,2 @@
+/home/cseliot/.local/share/Steam/steamapps/common/sbox/
+S:/steamapps/common/sbox/
