@@ -38,8 +38,10 @@ SESSION START? YES!
 	
 TASKS:
 
-	Task 1: DONE? NO!
+	Task 1: DONE? YES!
 		The sun -> moon transition is instant, not a fade.
+		Result: sky blend and light colour fade across an exposed window at each horizon crossing (Fade Fraction, default 0.1 of the cycle, ~34 s at 338 s). The light dims to Twilight Brightness (default 0.05) exactly where it swaps from the sun's angle to the moon's, so the swap is hidden. New shader parameter g_flMoonVisible gates the sky shader's own moon disc + halo to when the light is the moon (Q6/A6); night_sky.vmat carries it as 1 so editor/preview views keep the old look. Settings: CODE > DayNightCycle > Fade Fraction / Twilight Brightness.
+		Evidence: offline gate 0 errors; live play probe 15/15 rows (blend/dip/colour curve exact at 0.24/0.25/0.26 and 0.74/0.75/0.76, never black, min colour sum 0.077); moon-side gate probe 7/7 (0 by day, 1 by night); review r1: 0 HIGH after dispositions (1 HIGH rejected by live check, 1 MEDIUM fixed by design, 1 MEDIUM fixed by the gate), r2: 0 HIGH 0 MEDIUM; shader compiled clean (ShaderCompiler).
 
 	Task 0: DONE? YES!
 		Ther is a moon object in the project, already correct distance from origin. Just need it to be equal light source angle when the DayNightCycle code is in night mode, the moon rising as the sun sets.
@@ -82,6 +84,9 @@ Parent decisions (change if wrong):
 - The driver never saves while your sessions hold unsaved changes (save_scene would write your in-memory edits too); it stops and reports instead.
 - Push target: remote/main (github CSEliot/labyrinth). The first push also sends your commit "Fu" (b92f46d).
 - models/moon/moon.vmdl is not under Assets/ (resolves in the editor, likely a downloaded cloud asset); left as is.
+
+Q6 (Task 1, raised by review): during the half-window before the swap the light is still the sun, so the sky shader's own 2.2-degree moon disc fades in over the setting/rising sun (invisible at a 5-degree peak, ~0.2 brightness at 40). How to handle it?
+A6: Shader fix: a new night_sky parameter draws the shader's own moon disc + halo only while the light is the moon; DayNightCycle sets it. Needs a shader recompile; .shader_c rides in the Task 1 commit.
 
 ---
 

@@ -29,6 +29,7 @@ COMMON
 
 	// ---- Tunables (all exposed to the material editor via Default*/Range/UiGroup) ---------------------------------------------------------------
 	float g_flNightBlend        < Default( 1.0 );       Range( 0.0, 1.0 );      UiGroup( "Cycle,05/10" ); >;  // 0 = day (stock atmosphere look), 1 = night
+	float g_flMoonVisible       < Default( 0.0 );       Range( 0.0, 1.0 );      UiGroup( "Cycle,05/15" ); >;  // 1 = the light currently represents the moon (drives the moon disc + halo)
 	float g_flDayAtmosphere     < Default( 1.0 );       Range( 0.0, 4.0 );      UiGroup( "Cycle,05/20" ); >;  // day scattering multiplier
 	float g_flNightAtmosphere   < Default( 0.03 );      Range( 0.0, 1.0 );      UiGroup( "Night Sky,10/10" ); >;  // how much of the day scattering survives
 	float3 g_vNightZenith       < UiType( Color );      Default3( 0.010, 0.014, 0.035 ); UiGroup( "Night Sky,10/20" ); >;  // sky colour overhead
@@ -470,14 +471,14 @@ PS
 		// The moon has its own albedo: tinting it by the light colour makes a dim
 		// coloured "night sun" produce a dim coloured moon. The atmosphere above keeps
 		// using the light colour, because that term really is the light's scattering.
-		vColor += g_vMoonColor * g_flMoonBrightness * nightBlend * ( disc + halo );
+		vColor += g_vMoonColor * g_flMoonBrightness * nightBlend * g_flMoonVisible * ( disc + halo );
 
 		// Stars, washed out near the moon and behind its halo.
 		float3 stars = StarField( vRay ) * nightBlend;
 
 		// The wash is scaled by the blend too: an unscaled one punches a star-free hole
 		// around a moon that is invisible at low night blend.
-		float moonWash = saturate( disc * 1.5f + halo * 2.0f ) * nightBlend;
+		float moonWash = saturate( disc * 1.5f + halo * 2.0f ) * nightBlend * g_flMoonVisible;
 		stars *= saturate( 1.0f - moonWash );
 		vColor += stars;
 

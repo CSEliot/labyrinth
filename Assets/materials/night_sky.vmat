@@ -6,6 +6,7 @@ Layer0
 
 	// --- Cycle (animate g_flNightBlend instead of swapping skybox components) ----
 	g_flNightBlend			"1.000"
+	g_flMoonVisible			"1.000"		// fallback for views DayNightCycle does not drive; the component overwrites it
 	g_flDayAtmosphere		"1.000"
 
 	// --- Night base -------------------------------------------------------

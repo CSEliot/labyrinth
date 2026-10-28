@@ -13,7 +13,8 @@
 // Description:
 // Drives a looping day/night cycle from a single 0..1 Degree value: the light follows
 // an arc that peaks at _ElevationDegrees, the moon object orbits opposite the sun, and
-// at night the light takes the moon's angle (hard day/night switch for now).
+// at night the light takes the moon's angle. Sky and light fade across a window at sunset
+// and sunrise, and the light dims (never black) while it swaps between the two angles.
 // 
 // License:
 // This code is provided "as is," without warranty of any kind, express or
@@ -49,11 +50,22 @@ public sealed class DayNightCycle : Component
     [Property] private GameObject _Moon { get; set; }
     [Property] private Color _DayColor { get; set; }
     [Property] private Color _NightColor { get; set; }
+    // Width of each fade window (sunset and sunrise), as a fraction of the full cycle, centred on the
+    // horizon crossing. 0.1 = 10% of _CycleSeconds. 0 = instant switch.
+    [Property, Range( 0f, 0.5f )] private float _FadeFraction { get; set; } = 0.1f;
+    // Light brightness at the horizon crossing, where the light swaps from the sun's angle to the moon's
+    // (1 = no dip; the sun-to-moon angle swap is then visible). Clamped to at least 0.01: a black
+    // light means "sun off".
+    [Property, Range( 0.01f, 1f )] private float _TwilightBrightness { get; set; } = 0.05f;
 
     // Moon distance from the world origin, captured from its authored position the first time Apply
     // runs (OnEnabled runs before OnStart, so capture lazily). 0 = not captured yet; a hotload also
     // leaves it 0 and the capture then reads the moon's current (already orbiting) distance.
     private float _moonRadius;
+
+    // What Apply() last wrote to the sky material's g_flMoonVisible (1 while the light is the moon),
+    // kept as a field so a play probe can read it: Material has no float getter.
+    internal float _MoonVisible;
 
     // Private copy of the sky material: Material.Set on the shared loaded .vmat flags the
     // asset as edited (dirty in the editor every tick), so we only ever write to this copy.
@@ -124,10 +136,16 @@ public sealed class DayNightCycle : Component
         float yaw = _SweepDegrees * Degree;
         Rotation sunRotation = Rotation.FromYaw( yaw ) * Rotation.From( sunAltitude, 0f, 0f );
 
-        // Below the horizon is night. Hard switch for now (Task 1 turns this into a fade); this
-        // is the ONE place the night test lives.
+        // Sky and light fade across the window at each horizon crossing; the light swaps from the
+        // sun's angle to the moon's at the bottom of the dip, where the light is dimmest.
+        float nightBlend = NightBlendAt( Degree );
+
         if ( _SkyBoxMaterial is not null )
-            _SkyBoxMaterial.Set( "g_flNightBlend", isNight ? 1f : 0f );
+        {
+            _SkyBoxMaterial.Set( "g_flNightBlend", nightBlend );
+            _SkyBoxMaterial.Set( "g_flMoonVisible", isNight ? 1f : 0f );
+            _MoonVisible = isNight ? 1f : 0f;
+        }
 
         ApplyMoon( sunRotation );
 
@@ -136,15 +154,45 @@ public sealed class DayNightCycle : Component
 
         // This component owns the light's rotation. At night the one light takes the moon's
         // angle: the moon sits opposite the sun, so its disc (the light's Backward) is drawn on
-        // the moon object instead of on the sun, which is below the horizon now.
+        // the moon object instead of on the sun, which is below the horizon now. isNight only
+        // chooses the angle; brightness is faded separately below.
         _Sun.WorldRotation = isNight
             ? Rotation.FromYaw( yaw + 180f ) * Rotation.From( -sunAltitude, 0f, 0f )   // disc on the moon
             : sunRotation;
 
         // Never pure black: a black directional light means "sun off" and the sky shader
-        // stops drawing the sun/moon disc. Day and night are two lit tints, swapped whole.
-        _Sun.LightColor = isNight ? _NightColor : _DayColor;
+        // stops drawing the sun/moon disc. The tint fades day -> night while the dim (floored
+        // by _TwilightBrightness, whose clamp minimum is 0.01) hides the angle swap at the horizon.
+        var tint = Color.Lerp( _DayColor, _NightColor, nightBlend );
+        float k = TwilightScaleAt( Degree );
+        _Sun.LightColor = new Color( tint.r * k, tint.g * k, tint.b * k, tint.a );
     }
+
+    // 0 = full day tint, 1 = full night tint, smoothed across _FadeFraction around each horizon
+    // crossing (0.25 sunset, 0.75 sunrise). The formula is 0 at both Degree 0 and Degree 1, so the
+    // blend is continuous across the 0..1 wrap.
+    private float NightBlendAt( float degree )
+    {
+        float w = Math.Clamp( _FadeFraction, 0f, 0.5f );
+        if ( w <= 0f ) return ( degree > 0.25f && degree < 0.75f ) ? 1f : 0f;
+        if ( degree <= 0.5f ) return Smooth01( ( degree - 0.25f ) / w + 0.5f );        // sunset: 0 -> 1
+        return 1f - Smooth01( ( degree - 0.75f ) / w + 0.5f );                         // sunrise: 1 -> 0
+    }
+
+    // Brightness multiplier for the light colour: 1 except inside a fade window, where it dips to
+    // minBrightness at the crossing. Never 0, because a black light means "sun off".
+    private float TwilightScaleAt( float degree )
+    {
+        float w = Math.Clamp( _FadeFraction, 0f, 0.5f );
+        float minBrightness = Math.Clamp( _TwilightBrightness, 0.01f, 1f );
+        if ( w <= 0f ) return 1f;
+        // 1 at a crossing, 0 at the window edges.
+        float bump = MathF.Max( MathF.Max( 1f - MathF.Abs( degree - 0.25f ) / ( w * 0.5f ),
+                                           1f - MathF.Abs( degree - 0.75f ) / ( w * 0.5f ) ), 0f );
+        return 1f - ( 1f - minBrightness ) * Smooth01( bump );
+    }
+
+    private static float Smooth01( float x ) { x = Math.Clamp( x, 0f, 1f ); return x * x * ( 3f - 2f * x ); }
 
     // Keeps the moon object opposite the sun at its authored distance, turning with the orbit so
     // its local +X still faces the world origin (its child light keeps the far-side offset).
