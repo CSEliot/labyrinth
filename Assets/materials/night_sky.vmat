@@ -1,8 +1,12 @@
-// Night sky: procedural stars + moon disc, dimmed atmosphere.
+// Day/night sky: one material for both ends, blended by g_flNightBlend (0 = day, 1 = night).
 // Points at the compiled shader; the path must contain "sky" or SkyBox2D refuses it.
 Layer0
 {
 	shader "shaders/night_sky.shader_c"
+
+	// --- Cycle (animate g_flNightBlend instead of swapping skybox components) ----
+	g_flNightBlend			"1.000"
+	g_flDayAtmosphere		"1.000"
 
 	// --- Night base -------------------------------------------------------
 	g_flNightAtmosphere		"0.030"
@@ -19,9 +23,15 @@ Layer0
 
 	// --- Moon -------------------------------------------------------------
 	g_flMoonSizeDeg			"2.200"
+	g_vMoonColor			"[1.000000 0.970000 0.920000]"
 	g_flMoonBrightness		"3.000"
 	g_flMoonHaloStrength	"0.350"
 	g_flMoonHaloFalloff		"12.000"
 	g_flMoonMottle			"0.250"
 	g_flMoonEdgeSoftness	"0.080"
+	g_flMoonHorizonFade		"4.000"
+
+	// --- Sun (day end of the blend) ---------------------------------------
+	g_flSunBrightness		"10.000"
+	g_flSunSharpness		"10000.000"
 }

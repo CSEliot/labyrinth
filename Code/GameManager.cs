@@ -89,7 +89,7 @@ public sealed class GameManager : Component
 		{
 			var go = _GameSingletons[i];
 			var g = go.Clone();
-			g.Parent = GameObject;
+			// g.Parent = GameObject;
 		}
 		
 		_NetworkHelper?.StartServer = true;

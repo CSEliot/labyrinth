@@ -41,12 +41,14 @@ COMMON
 	float g_flStarHorizonFade   < Default( 4.0 );       Range( 0.0, 40.0 );     UiGroup( "Stars,20/50" ); >;
 	float g_flStarTwinkle       < Default( 0.0 );       Range( 0.0, 1.0 );      UiGroup( "Stars,20/60" ); >;  // 0 = static field
 
-	float g_flMoonSizeDeg       < Default( 2.2 );       Range( 0.1, 20.0 );     UiGroup( "Moon,30/10" ); >;  // angular diameter, degrees
+	float g_flMoonSizeDeg       < Default( 2.2 );       Range( 0.2, 20.0 );     UiGroup( "Moon,30/10" ); >;  // angular diameter, degrees
+	float3 g_vMoonColor         < UiType( Color );      Default3( 1.0, 0.97, 0.92 ); UiGroup( "Moon,30/15" ); >;  // the moon's own albedo (not the light colour)
 	float g_flMoonBrightness    < Default( 3.0 );       Range( 0.0, 50.0 );     UiGroup( "Moon,30/20" ); >;
 	float g_flMoonHaloStrength  < Default( 0.35 );      Range( 0.0, 4.0 );      UiGroup( "Moon,30/30" ); >;
 	float g_flMoonHaloFalloff   < Default( 12.0 );      Range( 1.0, 128.0 );    UiGroup( "Moon,30/40" ); >;
 	float g_flMoonMottle        < Default( 0.25 );      Range( 0.0, 1.0 );      UiGroup( "Moon,30/50" ); >;  // surface variation, hides the flat disc
 	float g_flMoonEdgeSoftness  < Default( 0.08 );      Range( 0.0, 1.0 );      UiGroup( "Moon,30/60" ); >;  // fraction of radius used for the soft edge
+	float g_flMoonHorizonFade   < Default( 4.0 );       Range( 0.25, 40.0 );    UiGroup( "Moon,30/70" ); >;  // how fast the whole disc fades out as the moon sets
 
 	float g_flSunBrightness     < Default( 10.0 );      Range( 0.0, 200.0 );    UiGroup( "Sun,40/10" ); >;  // stock shader multiplies the disc by 10
 	float g_flSunSharpness      < Default( 10000.0 );   Range( 100.0, 200000.0 ); UiGroup( "Sun,40/20" ); >;  // larger = smaller, harder disc
@@ -269,25 +271,42 @@ PS
 		float3 cell = floor( p );
 		float3 accum = 0.0f;
 
+		// Angular size of one pixel, from the screen-space derivative of the view ray. At
+		// high density a star is smaller than a pixel, so a fixed radius makes its peak
+		// brightness a sub-pixel lottery that shimmers as the camera pans. Growth is capped
+		// in cell units and energy-compensated below, so on-screen brightness is preserved.
+		float pixAng = max( length( fwidth( rayDir ) ), 1e-6f );
+		float minCells = pixAng * g_flStarDensity * 0.75f;
+
+		[loop]
 		for ( int x = -1; x <= 1; x++ )
+		[loop]
 		for ( int y = -1; y <= 1; y++ )
+		[loop]
 		for ( int z = -1; z <= 1; z++ )
 		{
 			float3 c = cell + float3( x, y, z );
-			float3 h = Hash31( c );
 
-			// Most cells are empty.
+			// Most cells are empty, so test occupancy before the position hash: Hash31 is
+			// three sin calls and would be discarded by the continue below ~82% of the time.
 			float exists = step( g_flStarThreshold, Hash11( c + 11.7 ) );
 			if ( exists <= 0.0f )
 				continue;
+
+			float3 h = Hash31( c );
 
 			float3 starPos = c + h;
 			float dist = length( p - starPos );
 
 			// Brighter stars read slightly larger; the sqrt keeps the size range tight.
-			float radius = g_flStarSize * ( 0.45f + 0.75f * sqrt( h.y ) );
+			float baseRadius = g_flStarSize * ( 0.45f + 0.75f * sqrt( h.y ) );
+			float radius = max( baseRadius, minCells );
 			float point = 1.0f - saturate( dist / max( radius, 1e-4f ) );
 			point = point * point;
+
+			// Spreading the point over a larger radius thins it out, so scale by the area
+			// ratio to keep the integrated energy (and total sky brightness) constant.
+			float energy = ( baseRadius * baseRadius ) / ( radius * radius );
 
 			// Luminance spread: a few bright ones, many faint.
 			float magnitude = pow( saturate( h.y ), 3.0f ) + 0.08f;
@@ -301,13 +320,18 @@ PS
 				twinkle = 1.0f - g_flStarTwinkle * ( 0.5f + 0.5f * sin( g_flTime * 2.3f + h.x * 61.0f ) );
 			}
 
-			accum += point * magnitude * twinkle * tint;
+			accum += point * magnitude * twinkle * tint * energy;
 		}
 
 		accum *= g_flStarBrightness;
 
 		// Gentle horizon fade (the stock shader uses a very harsh vRay.z * 100).
 		accum *= saturate( rayDir.z * g_flStarHorizonFade + 0.15f );
+
+		// The soft fade above only reaches 0.15 at the horizon, so the field would still be
+		// drawn down to where 0.15 * fade == 0. Hard-clip it at z = 0 (stars never rise from
+		// below the horizon); the fade constant stays the softness knob above it.
+		accum *= saturate( rayDir.z );
 
 		return accum;
 	}
@@ -321,38 +345,73 @@ PS
 	}
 
 	// Moon: soft-edged disc at the directional light direction plus a broad halo.
-	float MoonDisc( float3 rayDir, float3 moonDirectionWs )
+	// The whole disc fades uniformly with the moon's own altitude (not the view ray's),
+	// so it dims and disappears as a body instead of being sliced at the horizon line.
+	// Returns the shaded disc value and hands the geometric coverage (1 inside the disc,
+	// 0 outside, ramped across the soft edge) back to the caller so the halo can be
+	// masked off the disc without borrowing the disc's limb/mottle darkening.
+	float MoonDisc( float3 rayDir, float3 moonDirectionWs, out float coverage )
 	{
-		float cosAngle = saturate( dot( rayDir, moonDirectionWs ) );
-		float angle = acos( cosAngle );
-		float radius = radians( max( g_flMoonSizeDeg, 0.01f ) * 0.5f );
+		coverage = 0.0f;
 
-		float inner = radius * saturate( 1.0f - g_flMoonEdgeSoftness );
-		float disc = 1.0f - smoothstep( inner, radius, angle );
-
-		if ( disc <= 0.0f )
+		float moonFade = saturate( moonDirectionWs.z * g_flMoonHorizonFade );
+		if ( moonFade <= 0.0f )
 			return 0.0f;
 
-		// Limb darkening: brighter centre, dimmer edge.
-		float limb = 1.0f - 0.35f * saturate( angle / max( radius, 1e-4f ) );
+		// Safe to sample g_tBlueNoise after this early-out: moonFade derives from a light
+		// uniform, so the branch is uniform across the whole draw (the ray-direction test
+		// that used to sit here was per-pixel and was not).
+		float mottle = noise( rayDir * 90.0f );
+
+		// Dot-space angular test: acos loses too much precision on a disc this small
+		// (a 2 degree moon sits at dot ~0.999), so compare cosines directly.
+		float moonSize = max( g_flMoonSizeDeg, 0.01f );
+		float radius = radians( moonSize * 0.5f );
+		float cosOuter = cos( radius );
+		float cosInner = cos( radius * saturate( 1.0f - g_flMoonEdgeSoftness ) );
+
+		// Floor the edge width relative to the disc's own ( 1 - cos ) scale. An absolute
+		// 1e-6 floor only fits large discs: below ~0.16 degrees it exceeds the whole span
+		// and the disc never reaches full opacity (0.29 at the centre for a 0.1 degree moon).
+		float edgeWidth = max( cosInner - cosOuter, ( 1.0f - cosOuter ) * 1e-3f );
+
+		float cosAngle = dot( rayDir, moonDirectionWs );
+		float discT = saturate( ( cosAngle - cosOuter ) / edgeWidth );
+		float shape = discT * discT * ( 3.0f - 2.0f * discT );   // smoothstep( cosOuter, cosInner, cosAngle )
+
+		// Limb darkening: brighter centre, dimmer edge. Over a disc this small
+		// angle^2 ~ 2 * ( 1 - cos ), so this reproduces ( 1 - 0.35 * angle / radius )^2
+		// (1.0 at the centre, ~0.42 at the limb) without an acos of a near-one dot.
+		float limbEdge = saturate( sqrt( saturate( ( 1.0f - cosAngle ) / max( 1.0f - cosOuter, 1e-8f ) ) ) );
+		float limb = 1.0f - 0.35f * limbEdge;
 		limb *= limb;
 
 		// Surface variation so the disc does not read as a flat circle.
-		float mottle = noise( rayDir * 90.0f );
 		float surface = lerp( 1.0f, 0.55f + 0.9f * mottle, g_flMoonMottle );
 
-		return disc * limb * surface;
+		// Geometric coverage only: scaling it by moonFade would let the halo leak back onto
+		// the disc as the moon sets (the halo already carries its own moonFade).
+		coverage = shape;
+
+		return shape * limb * surface * moonFade;
 	}
 
-	float MoonHalo( float3 rayDir, float3 moonDirectionWs )
+	// Broad glow around the moon. discCoverage comes from MoonDisc: because the halo is
+	// multiplied by ( 1 - discCoverage ) it is exactly zero over the whole disc (limb and
+	// mottle keep their full contrast) and back to full strength right at the limb, so
+	// there is no gap; the hand-over runs across the disc's own soft edge, so no hard ring.
+	float MoonHalo( float3 rayDir, float3 moonDirectionWs, float discCoverage )
 	{
+		float moonFade = saturate( moonDirectionWs.z * g_flMoonHorizonFade );
+		if ( moonFade <= 0.0f )
+			return 0.0f;
+
 		float cosAngle = saturate( dot( rayDir, moonDirectionWs ) );
 		float halo = pow( cosAngle, max( g_flMoonHaloFalloff, 1.0f ) ) * g_flMoonHaloStrength;
 
-		// Tight glow just outside the disc.
-		halo += pow( cosAngle, 512.0f ) * g_flMoonHaloStrength * 2.0f;
+		halo *= 1.0f - saturate( discCoverage );
 
-		return halo;
+		return halo * moonFade;
 	}
 
 	// Main ---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -368,10 +427,16 @@ PS
 		float3 moonDirectionWs = -g_DirectionalLightDirection.xyz;
 		float3 moonColor = g_DirectionalLightColor.rgb;
 
+		// A usable direction is all the moon needs. The engine calls a black light "sun off"
+		// and stops writing g_DirectionalLightDirection entirely, so gating the moon on the
+		// light being lit and coloured (as the atmosphere and the sun disc must be) would
+		// delete it at night.
+		float dirValid = dot( moonDirectionWs, moonDirectionWs ) > 1e-8f ? 1.0f : 0.0f;
+
 		float lightValid = 0.0f;
 		if ( g_DirectionalLightEnabled )
 		{
-			if ( dot( moonDirectionWs, moonDirectionWs ) > 0.0f && dot( moonColor, moonColor ) > 0.0f )
+			if ( dirValid > 0.0f && dot( moonColor, moonColor ) > 0.0f )
 				lightValid = 1.0f;
 		}
 
@@ -382,8 +447,16 @@ PS
 		float up = saturate( vRay.z );
 		float3 vColor = lerp( g_vNightHorizon, g_vNightZenith, pow( up, 0.45f ) ) * nightBlend;
 
+		// The moon keeps its own albedo and does not need the light to be lit, so disc and
+		// halo are gated on the direction alone - only the light-coloured terms below are not.
+		float moonCoverage = 0.0f;
 		float disc = 0.0f;
 		float halo = 0.0f;
+		if ( dirValid > 0.0f )
+		{
+			disc = MoonDisc( vRay, moonDirectionWs, moonCoverage );
+			halo = MoonHalo( vRay, moonDirectionWs, moonCoverage );
+		}
 
 		if ( lightValid > 0.0f )
 		{
@@ -392,16 +465,19 @@ PS
 			vColor += GetAtmosphere( vRay, moonDirectionWs, moonColor ) * atmosphereIntensity;
 
 			vColor += SunDisc( vRay, moonDirectionWs, moonColor ) * dayBlend;
-
-			disc = MoonDisc( vRay, moonDirectionWs );
-			halo = MoonHalo( vRay, moonDirectionWs );
-
-			vColor += moonColor * g_flMoonBrightness * nightBlend * ( disc + halo );
 		}
+
+		// The moon has its own albedo: tinting it by the light colour makes a dim
+		// coloured "night sun" produce a dim coloured moon. The atmosphere above keeps
+		// using the light colour, because that term really is the light's scattering.
+		vColor += g_vMoonColor * g_flMoonBrightness * nightBlend * ( disc + halo );
 
 		// Stars, washed out near the moon and behind its halo.
 		float3 stars = StarField( vRay ) * nightBlend;
-		float moonWash = saturate( disc * 1.5f + halo * 2.0f );
+
+		// The wash is scaled by the blend too: an unscaled one punches a star-free hole
+		// around a moon that is invisible at low night blend.
+		float moonWash = saturate( disc * 1.5f + halo * 2.0f ) * nightBlend;
 		stars *= saturate( 1.0f - moonWash );
 		vColor += stars;
 

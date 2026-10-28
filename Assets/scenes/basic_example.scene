@@ -329,23 +329,7 @@
                       "LoopEnd": -1,
                       "Frames": [
                         {
-                          "Texture": {
-                            "$compiler": "texture",
-                            "$source": "svgsource",
-                            "data": {
-                              "Size": "462,224",
-                              "Source": "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"462\" height=\"224\" xml:space=\"preserve\" version=\"1.1\" viewBox=\"0 0 462 224\">\n  <image width=\"462\" height=\"224\" xlink:href=\"data:image/png;base64,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\"/>\n</svg>",
-                              "Colorize": false,
-                              "TargetColor": "1,1,1,1",
-                              "Scale": 1,
-                              "Offset": "0,0",
-                              "Rotate": 0,
-                              "FlipVertical": false,
-                              "FlipHorizontal": false,
-                              "FormatOverride": null
-                            },
-                            "compiled": "textures/generated/svgsource/f12f200bf2fa61ef.vtex"
-                          },
+                          "Texture": null,
                           "BroadcastMessages": []
                         }
                       ]
@@ -993,13 +977,213 @@
       ]
     },
     {
-      "__guid": "09692ab9-6f07-4509-9dbc-93c7a587675d",
+      "__guid": "ce110111-f4aa-4dc1-9e47-27fe3636e139",
       "__version": 2,
       "Flags": 0,
-      "Name": "moonlight",
-      "Position": "-4.35125758E-09,0.063235499,-0.0497725829",
-      "Rotation": "0,0.866025388,0,0.49999997",
-      "Scale": "0,0,0",
+      "Name": "moon",
+      "Position": "0,-0.000289946795,-20000",
+      "Rotation": "-0.707106769,3.09086197E-08,-0.707106769,3.09086197E-08",
+      "Scale": "10,10,10",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "e6b623ba-978a-405f-902d-572db30147f3",
+          "__enabled": true,
+          "Flags": 0,
+          "BodyGroups": 18446744073709551615,
+          "CreateAttachments": false,
+          "LodOverride": null,
+          "MaterialGroup": null,
+          "MaterialOverride": null,
+          "Materials": null,
+          "Model": {
+            "Id": "b3b6697a-1b5b-440e-adf6-081686607499",
+            "Path": "models/moon/moon.vmdl"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "RenderOptions": {
+            "GameLayer": true,
+            "OverlayLayer": false,
+            "BloomLayer": true,
+            "AfterUILayer": false
+          },
+          "RenderType": "Off",
+          "Tint": "1,1,1,1"
+        },
+        {
+          "__type": "Sandbox.ModelCollider",
+          "__guid": "56ce19e1-a4b4-46e8-b979-bb0c5900c6a7",
+          "__enabled": false,
+          "Flags": 0,
+          "ColliderFlags": 0,
+          "Elasticity": null,
+          "Friction": null,
+          "IsTrigger": false,
+          "Model": {
+            "Id": "b3b6697a-1b5b-440e-adf6-081686607499",
+            "Path": "models/moon/moon.vmdl"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "OnObjectTriggerEnter": null,
+          "OnObjectTriggerExit": null,
+          "OnTriggerEnter": null,
+          "OnTriggerExit": null,
+          "RollingResistance": null,
+          "Static": false,
+          "Surface": null,
+          "SurfaceVelocity": "0,0,0"
+        },
+        {
+          "__type": "Sandbox.Rigidbody",
+          "__guid": "262204fa-a367-4371-82f2-c5d9b9499962",
+          "__enabled": false,
+          "Flags": 0,
+          "AngularDamping": 0,
+          "EnableImpactDamage": true,
+          "EnhancedCcd": false,
+          "Gravity": true,
+          "GravityScale": 1,
+          "ImpactDamage": 0,
+          "InertiaScale": 1,
+          "LinearDamping": 0,
+          "Locking": {
+            "X": false,
+            "Y": false,
+            "Z": false,
+            "Pitch": false,
+            "Yaw": false,
+            "Roll": false
+          },
+          "MassCenterOverride": "0,0,0",
+          "MassOverride": 0,
+          "MinImpactDamageSpeed": 500,
+          "MotionEnabled": true,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "OverrideMassCenter": false,
+          "RigidbodyFlags": 0,
+          "SleepThreshold": 2,
+          "StartAsleep": false
+        }
+      ],
+      "Children": [
+        {
+          "__guid": "37622c2e-68b4-4ab3-a034-568e4781441d",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Spot Light",
+          "Position": "-1100,0,-4.88281257E-05",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "light_spot",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.SpotLight",
+              "__guid": "aecc4a00-194d-4aef-a8d7-70964c2fc4a3",
+              "__enabled": true,
+              "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
+              "Attenuation": 0,
+              "BakeLightIndex": -1,
+              "ConeInner": 0,
+              "ConeOuter": 38.59756,
+              "Contribution": "Diffuse, Specular, Transmissive",
+              "Cookie": null,
+              "FogMode": "Disabled",
+              "FogStrength": 1,
+              "Intensity": 1,
+              "LightColor": "1,1,1,1",
+              "MixedShadows": false,
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "Radius": 10000,
+              "ShadowBias": 0,
+              "ShadowHardness": 0,
+              "Shadows": false,
+              "Temperature": 6500
+            }
+          ],
+          "Children": []
+        }
+      ]
+    },
+    {
+      "__guid": "1b22c1a8-cca4-40c6-95bf-c6ba5588fc51",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "sun-moon-light",
+      "Position": "0,0,0",
+      "Rotation": "0,-0.707106769,0,-0.707106769",
+      "Scale": "1,1,1",
       "Tags": "light_directional,light",
       "Enabled": true,
       "NetworkMode": 2,
@@ -1010,61 +1194,55 @@
       "Components": [
         {
           "__type": "Sandbox.DirectionalLight",
-          "__guid": "c9022097-089a-4052-be2b-868c79a1e200",
+          "__guid": "49c48e2d-e341-48f8-ac05-03d9f74bfe67",
           "__enabled": true,
           "Flags": 0,
+          "__version": 1,
+          "AnimationCurve": [
+            {
+              "x": 0,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.5,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "AnimationDuration": 2,
+          "AnimationEnabled": false,
+          "AnimationGradient": {
+            "blend": "Linear",
+            "color": [
+              {
+                "t": 0.5,
+                "c": "1,1,1,1"
+              }
+            ],
+            "alpha": []
+          },
+          "AnimationPattern": "Flicker",
+          "AnimationSpeed": 1,
+          "AnimationTimeOffset": 0,
           "BakeLightIndex": -1,
           "ContactShadows": true,
           "Contribution": "Diffuse, Specular, Transmissive",
           "FogMode": "Enabled",
           "FogStrength": 1,
           "IncludeStaticShadowCasters": false,
-          "LightColor": "1,1,1,1",
-          "MixedShadows": false,
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "ShadowBias": 0,
-          "ShadowCascadeCount": 4,
-          "ShadowCascadeSplitRatio": 0.91,
-          "ShadowHardness": 0,
-          "Shadows": true,
-          "SkyColor": "0.86512,0.86512,0.86512,0",
-          "Visualizer": {}
-        }
-      ],
-      "Children": []
-    },
-    {
-      "__guid": "1b22c1a8-cca4-40c6-95bf-c6ba5588fc51",
-      "__version": 2,
-      "Flags": 0,
-      "Name": "sunlight",
-      "Position": "0,0,0",
-      "Rotation": "0,0,0,1",
-      "Scale": "1,1,1",
-      "Tags": "light_directional,light",
-      "Enabled": false,
-      "NetworkMode": 2,
-      "NetworkFlags": 0,
-      "NetworkOrphaned": 0,
-      "NetworkTransmit": true,
-      "OwnerTransfer": 1,
-      "Components": [
-        {
-          "__type": "Sandbox.DirectionalLight",
-          "__guid": "49c48e2d-e341-48f8-ac05-03d9f74bfe67",
-          "__enabled": false,
-          "Flags": 0,
-          "BakeLightIndex": -1,
-          "ContactShadows": true,
-          "Contribution": "Diffuse, Specular, Transmissive",
-          "FogMode": "Enabled",
-          "FogStrength": 1,
-          "IncludeStaticShadowCasters": false,
+          "Intensity": 1,
           "LightColor": "0.91373,0.98039,1,1",
           "MixedShadows": false,
           "OnComponentDestroy": null,
@@ -1079,6 +1257,7 @@
           "ShadowHardness": 0,
           "Shadows": true,
           "SkyColor": "0,0,0,0",
+          "Temperature": 6500,
           "Visualizer": {}
         },
         {
@@ -1126,7 +1305,7 @@
           "OnComponentUpdate": null,
           "PlayerPrefab": {
             "_type": "gameobject",
-            "prefab": "player controller.prefab"
+            "prefab": "prefabs/player controller.prefab"
           },
           "SpawnPoints": [
             {
@@ -1144,7 +1323,7 @@
           "_GameSingletons": [
             {
               "_type": "gameobject",
-              "prefab": "maincamera.prefab"
+              "prefab": "prefabs/maincamera.prefab"
             }
           ],
           "_NetworkHelper": {
@@ -1160,6 +1339,36 @@
           "OnComponentStart": null,
           "OnComponentUpdate": null,
           "Seed": 1
+        },
+        {
+          "__type": "Sandbox.DayNightCycle",
+          "__guid": "72bd26c3-8416-4ef4-9750-24329ac51948",
+          "__enabled": true,
+          "Flags": 0,
+          "_CycleSeconds": 338.35367,
+          "_DayColor": "0.76744,0.78682,1,1",
+          "_ElevationDegrees": 5,
+          "_NightColor": "0.31628,0.00441,0.19153,1",
+          "_Skybox": {
+            "_type": "component",
+            "component_id": "9ae72f1c-077b-4981-841d-b5b2aebf0407",
+            "go": "dda29421-6851-455e-9a1e-47b2b700d365",
+            "component_type": "SkyBox2D"
+          },
+          "_Sun": {
+            "_type": "component",
+            "component_id": "49c48e2d-e341-48f8-ac05-03d9f74bfe67",
+            "go": "1b22c1a8-cca4-40c6-95bf-c6ba5588fc51",
+            "component_type": "DirectionalLight"
+          },
+          "_SweepDegrees": 360,
+          "Degree": 0,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null
         }
       ],
       "Children": []
@@ -1243,7 +1452,7 @@
       "__version": 2,
       "Flags": 0,
       "Name": "2D Skybox",
-      "Position": "-6632.07812,-5726.67822,0",
+      "Position": "0,0,0",
       "Rotation": "0,0,0,1",
       "Scale": "1,1,1",
       "Tags": "skybox",
@@ -1267,8 +1476,8 @@
           "OnComponentUpdate": null,
           "SkyIndirectLighting": true,
           "SkyMaterial": {
-            "Id": "8e49ac04-1256-e045-b12b-8b72f9679f1a",
-            "Path": "materials/sky/atmosphere_sky.vmat"
+            "Id": "9de3638c-c143-af41-9ca7-22667400975b",
+            "Path": "materials/night_sky.vmat"
           },
           "Tint": "1,1,1,1"
         }
@@ -1326,7 +1535,7 @@
           "SmoothingAngle": 40,
           "Static": true,
           "Surface": {
-            "Id": "1435b5a7-ea1c-5848-90bb-a6d5501777f7",
+            "Id": "a7b53514-1cea-4858-90bb-a6d5501777f7",
             "Path": "surfaces/ceramic.surface"
           },
           "SurfaceVelocity": "0,0,0"
@@ -1335,14 +1544,14 @@
       "Children": []
     },
     {
-      "__guid": "ce110111-f4aa-4dc1-9e47-27fe3636e139",
+      "__guid": "8564bd4e-e607-468a-9b5b-a5ee2b17ebc3",
       "__version": 2,
-      "Flags": 0,
-      "Name": "moon",
-      "Position": "20000,-0.000289916992,0",
-      "Rotation": "0,0,0,1",
-      "Scale": "10,10,10",
-      "Tags": "",
+      "Flags": 32768,
+      "Name": "floortrigger",
+      "Position": "-174.752426,124.1008,-227.615997",
+      "Rotation": "0,0,-0.0825948566,0.996583223",
+      "Scale": "1,1,1",
+      "Tags": "world",
       "Enabled": true,
       "NetworkMode": 2,
       "NetworkFlags": 0,
@@ -1351,72 +1560,24 @@
       "OwnerTransfer": 1,
       "Components": [
         {
-          "__type": "Sandbox.Prop",
-          "__guid": "a1dc2b59-1f6f-4bc7-9ae1-444e6d307509",
+          "__type": "Sandbox.MeshComponent",
+          "__guid": "b3758b94-72f0-4ed4-8ae4-21fa2997d4e5",
           "__enabled": true,
-          "Flags": 0,
-          "BodyGroups": 18446744073709551615,
-          "Health": 0,
-          "IsStatic": false,
-          "MaterialGroup": null,
-          "Model": {
-            "Id": "1e3e744a-6a11-3045-8856-2d79224249ab",
-            "Path": "models/moon/moon.vmdl"
-          },
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "OnGibsCreated": null,
-          "OnPropBreak": null,
-          "OnPropTakeDamage": null,
-          "StartAsleep": false,
-          "Tint": "1,1,1,1"
-        },
-        {
-          "__type": "Sandbox.ModelRenderer",
-          "__guid": "e6b623ba-978a-405f-902d-572db30147f3",
-          "__enabled": true,
-          "Flags": 0,
-          "BodyGroups": 18446744073709551615,
-          "CreateAttachments": false,
-          "LodOverride": null,
-          "MaterialGroup": null,
-          "MaterialOverride": null,
-          "Materials": null,
-          "Model": {
-            "Id": "1e3e744a-6a11-3045-8856-2d79224249ab",
-            "Path": "models/moon/moon.vmdl"
-          },
-          "OnComponentDestroy": null,
-          "OnComponentDisabled": null,
-          "OnComponentEnabled": null,
-          "OnComponentFixedUpdate": null,
-          "OnComponentStart": null,
-          "OnComponentUpdate": null,
-          "RenderOptions": {
-            "GameLayer": true,
-            "OverlayLayer": false,
-            "BloomLayer": true,
-            "AfterUILayer": false
-          },
-          "RenderType": "Off",
-          "Tint": "1,1,1,1"
-        },
-        {
-          "__type": "Sandbox.ModelCollider",
-          "__guid": "56ce19e1-a4b4-46e8-b979-bb0c5900c6a7",
-          "__enabled": false,
           "Flags": 0,
           "ColliderFlags": 0,
+          "Collision": "Mesh",
+          "Color": "1,1,1,1",
           "Elasticity": null,
           "Friction": null,
+          "HideInGame": false,
           "IsTrigger": false,
-          "Model": {
-            "Id": "1e3e744a-6a11-3045-8856-2d79224249ab",
-            "Path": "models/moon/moon.vmdl"
+          "Mesh": {
+            "Data": {
+              "$blob": "95331e08-73d7-8bf6-b35f-db350057eea9"
+            },
+            "Materials": [
+              "materials/concrete/floor/floor_tile_blend_02.vmat"
+            ]
           },
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
@@ -1428,95 +1589,41 @@
           "OnObjectTriggerExit": null,
           "OnTriggerEnter": null,
           "OnTriggerExit": null,
+          "RenderType": "On",
           "RollingResistance": null,
-          "Static": false,
+          "SmoothingAngle": 40,
+          "Static": true,
           "Surface": null,
           "SurfaceVelocity": "0,0,0"
         },
         {
-          "__type": "Sandbox.Rigidbody",
-          "__guid": "262204fa-a367-4371-82f2-c5d9b9499962",
-          "__enabled": false,
+          "__type": "Sandbox.BoxCollider",
+          "__guid": "21a54cce-a900-4d64-aba9-d6b99697cfa3",
+          "__enabled": true,
           "Flags": 0,
-          "AngularDamping": 0,
-          "EnableImpactDamage": true,
-          "EnhancedCcd": false,
-          "Gravity": true,
-          "GravityScale": 1,
-          "ImpactDamage": 0,
-          "InertiaScale": 1,
-          "LinearDamping": 0,
-          "Locking": {
-            "X": false,
-            "Y": false,
-            "Z": false,
-            "Pitch": false,
-            "Yaw": false,
-            "Roll": false
-          },
-          "MassCenterOverride": "0,0,0",
-          "MassOverride": 0,
-          "MinImpactDamageSpeed": 500,
-          "MotionEnabled": true,
+          "Center": "0,0,0",
+          "ColliderFlags": 0,
+          "Elasticity": null,
+          "Friction": null,
+          "IsTrigger": true,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null,
-          "OverrideMassCenter": false,
-          "RigidbodyFlags": 0,
-          "SleepThreshold": 2,
-          "StartAsleep": false
+          "OnObjectTriggerEnter": null,
+          "OnObjectTriggerExit": null,
+          "OnTriggerEnter": null,
+          "OnTriggerExit": null,
+          "RollingResistance": null,
+          "Scale": "69.4738464,74.4134903,141.480057",
+          "Static": true,
+          "Surface": null,
+          "SurfaceVelocity": "0,0,0"
         }
       ],
-      "Children": [
-        {
-          "__guid": "37622c2e-68b4-4ab3-a034-568e4781441d",
-          "__version": 2,
-          "Flags": 0,
-          "Name": "Spot Light",
-          "Position": "-1256.05737,0.000109863278,0.000122070312",
-          "Rotation": "0,0,0,1",
-          "Scale": "1,1,1",
-          "Tags": "light_spot,light",
-          "Enabled": true,
-          "NetworkMode": 2,
-          "NetworkFlags": 0,
-          "NetworkOrphaned": 0,
-          "NetworkTransmit": true,
-          "OwnerTransfer": 1,
-          "Components": [
-            {
-              "__type": "Sandbox.SpotLight",
-              "__guid": "aecc4a00-194d-4aef-a8d7-70964c2fc4a3",
-              "__enabled": true,
-              "Flags": 0,
-              "Attenuation": 0,
-              "BakeLightIndex": -1,
-              "ConeInner": 15,
-              "ConeOuter": 40.56338,
-              "Contribution": "Diffuse, Specular, Transmissive",
-              "Cookie": null,
-              "FogMode": "Disabled",
-              "FogStrength": 1,
-              "LightColor": "1,1,1,1",
-              "MixedShadows": false,
-              "OnComponentDestroy": null,
-              "OnComponentDisabled": null,
-              "OnComponentEnabled": null,
-              "OnComponentFixedUpdate": null,
-              "OnComponentStart": null,
-              "OnComponentUpdate": null,
-              "Radius": 10000,
-              "ShadowBias": 0,
-              "ShadowHardness": 0,
-              "Shadows": false
-            }
-          ],
-          "Children": []
-        }
-      ]
+      "Children": []
     }
   ],
   "SceneProperties": {
